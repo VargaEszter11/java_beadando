@@ -1,0 +1,7 @@
+2, Büszkeség és balítélet, Jane Austen, 432, 1813-01-28, 9780141439518, Klasszikus
+3, Az ember tragédiája, Madách Imre, 264, 1861-01-01, 9789630790956, Dráma
+4, A kódfejtő, Simon Singh, 448, 1999-03-01, 9789633895047, Tudomány
+5, Harry Potter és a bölcsek köve, J.K. Rowling, 336, 1997-06-26, 9789639307309, Fantasy
+6, A szolgálólány meséje, Margaret Atwood, 311, 1985-09-01, 9789633552002, Disztópia
+7, Ember a fellegvárban, Philip K. Dick, 249, 1962-10-01, 9789634191774, Sci-fi
+8, A sátán kutyája, Sir Arthur Conan Doyle, 25, 1902-04-01, 9789636891498, Krimi
