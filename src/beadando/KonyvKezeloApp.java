@@ -31,7 +31,7 @@ public class KonyvKezeloApp {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 400);
         resultPanel = new ResultPanel();
-        frame.add(resultPanel, BorderLayout.SOUTH);
+        frame.getContentPane().add(resultPanel, BorderLayout.SOUTH);
 
         model = new DefaultTableModel(new String[]{"ID", "Cím", "Szerző", "Oldalszám", "Kiadás dátuma", "ISBN", "Kategória", "", ""}, 0);
 
@@ -39,7 +39,7 @@ public class KonyvKezeloApp {
         table = new JTable(model);
         table.setRowHeight(30);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(0, 50, 900, 313);
+        scrollPane.setBounds(0, 50, 900, 259);
         frame.getContentPane().add(scrollPane);
 
         searchLabel = new JLabel("Keresés:");
@@ -60,12 +60,12 @@ public class KonyvKezeloApp {
         frame.getContentPane().add(searchButton);
 
         addButton = new JButton("Hozzáadás");
-        addButton.setBounds(800, 10, 100, 25);
+        addButton.setBounds(716, 10, 172, 25);
         addButton.addActionListener(e -> addData()); 
         frame.getContentPane().add(addButton);
         
         randomButton = new JButton("Mit olvassak legközelebb?");
-        randomButton.setBounds(650, 10, 140, 25);
+        randomButton.setBounds(450, 10, 220, 25);
         randomButton.addActionListener(e -> selectRandomBook());
         frame.getContentPane().add(randomButton);
 
