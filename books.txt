@@ -5,3 +5,4 @@
 6, A szolgálólány meséje, Margaret Atwood, 311, 1985-09-01, 9789633552002, Disztópia
 7, Ember a fellegvárban, Philip K. Dick, 249, 1962-10-01, 9789634191774, Sci-fi
 8, A sátán kutyája, Sir Arthur Conan Doyle, 25, 1902-04-01, 9789636891498, Krimi
+8, e, e, 4, 2000-10-10, 1111111111111, w

@@ -1,24 +1,19 @@
 package beadando;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Random;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 public class KonyvKezeloApp {
     private JFrame frame;
@@ -29,6 +24,7 @@ public class KonyvKezeloApp {
     private JButton searchButton;
     private JLabel searchLabel;
     private ResultPanel resultPanel;
+    private JButton randomButton;
 
     public KonyvKezeloApp() {
         frame = new JFrame("Könyvkezelő alkalmazás");
@@ -67,15 +63,24 @@ public class KonyvKezeloApp {
         addButton.setBounds(800, 10, 100, 25);
         addButton.addActionListener(e -> addData()); 
         frame.getContentPane().add(addButton);
+        
+        randomButton = new JButton("Mit olvassak legközelebb?");
+        randomButton.setBounds(650, 10, 140, 25);
+        randomButton.addActionListener(e -> selectRandomBook());
+        frame.getContentPane().add(randomButton);
 
         table.getColumnModel().getColumn(7).setCellRenderer(new EditButtonRenderer());
-        table.getColumnModel().getColumn(7).setCellEditor(new ButtonEditor(new JCheckBox()));
-
         table.getColumnModel().getColumn(8).setCellRenderer(new DeleteButtonRenderer());
-        table.getColumnModel().getColumn(8).setCellEditor(new ButtonEditor(new JCheckBox()));
+       
+        table.getColumnModel().getColumn(7).setCellEditor(new ButtonEditor(table, model, frame));
+        table.getColumnModel().getColumn(8).setCellEditor(new ButtonEditor(table, model, frame));
 
         frame.setVisible(true);
         loadFromFile();
+    }
+    
+    public DefaultTableModel getTableModel() {
+        return this.model;
     }
     
     public void loadFromFile() {
@@ -120,32 +125,7 @@ public class KonyvKezeloApp {
         new AddBookDialog(frame, model);
     }
     
-    private void editData(int rowId) {
-        new EditBookDialog(frame, rowId, model);
-    }
-
-    private void deleteData(int rowId) {
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if ((int) model.getValueAt(i, 0) == rowId) {
-                model.removeRow(i);
-                break;
-            }
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("books.txt"))) {
-            for (int i = 0; i < model.getRowCount(); i++) {
-                writer.write(model.getValueAt(i, 0) + ", " +
-                        model.getValueAt(i, 1) + ", " +
-                        model.getValueAt(i, 2) + ", " +
-                        model.getValueAt(i, 3) + ", " +
-                        model.getValueAt(i, 4) + ", " +
-                        model.getValueAt(i, 5) + ", " +
-                        model.getValueAt(i, 6) + "\n"); 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    
 
     private void searchBooks() {
         String searchText = searchField.getText().trim().toLowerCase();
@@ -196,71 +176,28 @@ public class KonyvKezeloApp {
             resultPanel.displayResults(0, "No books found matching '" + searchText + "'");
         }
     }
-
-    class EditButtonRenderer extends JButton implements TableCellRenderer {
-        public EditButtonRenderer() {
-            setText("Módosítás");
+    
+    private void selectRandomBook() {
+        if (model.getRowCount() == 0) {
+            resultPanel.displayResults(0, "Nincsenek könyvek a listában");
+            return;
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-            return this;
-        }
-    }
-
-    class DeleteButtonRenderer extends JButton implements TableCellRenderer {
-        public DeleteButtonRenderer() {
-            setText("Törlés");
-        }
-
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-            return this;
-        }
-    }
-
-    class ButtonEditor extends DefaultCellEditor {
-        private JButton button;
-        private boolean isPushed;
-        private int rowId;
-        private int column;
-
-        public ButtonEditor(JCheckBox checkBox) {
-            super(checkBox);
-            button = new JButton();
-            button.setOpaque(true);
-        }
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            rowId = (Integer) model.getValueAt(row, 0); 
-            this.column = column;
-
-            if (column == 7) {
-                button.setText("Módosítás");
-            } 
-            if (column == 8) {
-                button.setText("Törlés");
-            }
-
-            isPushed = true;
-
-            button.addActionListener(e -> {
-                if (isPushed) {
-                    if (column == 7) {
-                        editData(rowId); 
-                    } else if (column == 8) {
-                        deleteData(rowId); 
-                    }
-                    isPushed = false;
-                }
-            });
-
-            return button;
-        }
-
-        public Object getCellEditorValue() {
-            isPushed = false;
-            return "Művelet";
-        }
+        Random rand = new Random();
+        int randomRow = rand.nextInt(model.getRowCount());
+        
+        table.setRowSelectionInterval(randomRow, randomRow);
+        table.scrollRectToVisible(table.getCellRect(randomRow, 0, true));
+        
+        int id = (int) model.getValueAt(randomRow, 0);
+        String title = (String) model.getValueAt(randomRow, 1);
+        String author = (String) model.getValueAt(randomRow, 2);
+        
+        resultPanel.displayResults(1, 
+            "<html><b>Ezt olvasd:</b><br>" +
+            "ID: " + id + "<br>" +
+            "Cím: " + title + "<br>" +
+            "Szerző: " + author + "</html>");
     }
   }
+
