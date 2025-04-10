@@ -1,4 +1,4 @@
-package beadando;
+
 
 import java.awt.Color;
 import java.awt.Frame;

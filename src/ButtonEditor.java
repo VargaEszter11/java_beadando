@@ -1,4 +1,4 @@
-package beadando;
+
 
 import java.awt.Component;
 import java.io.BufferedWriter;

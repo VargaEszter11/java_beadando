@@ -1,4 +1,4 @@
-package beadando;
+
 
 import javax.swing.*;
 import java.awt.*;

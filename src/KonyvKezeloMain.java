@@ -1,8 +1,4 @@
-package beadando;
-
 import javax.swing.SwingUtilities;
-
-import Login;
 
 public class KonyvKezeloMain {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package beadando;
+
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
