@@ -2,4 +2,3 @@
 3, Az ember tragédiája, Madách Imre, 264, 1861-01-01, 9789630790956, Dráma
 4, A kódfejtő, Simon Singh, 448, 1999-03-01, 9789633895047, Tudomány
 5, Harry Potter és a bölcsek köve, J.K. Rowling, 336, 1997-06-26, 9789639307309, Fantasy
-6, teszt, test, 1, 2000-10-10, 6666666666666, r
