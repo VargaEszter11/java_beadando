@@ -3,12 +3,18 @@ package beadando;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.DefaultCellEditor;
@@ -20,7 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 public class KonyvKezeloApp {
     private JFrame frame;
@@ -40,7 +46,20 @@ public class KonyvKezeloApp {
         resultPanel = new ResultPanel();
         frame.getContentPane().add(resultPanel, BorderLayout.SOUTH);
 
-        model = new DefaultTableModel(new String[]{"ID", "Cím", "Szerző", "Oldalszám", "Kiadás dátuma", "ISBN", "Kategória", "", ""}, 0);
+        model = new DefaultTableModel(new String[]{"ID", "Cím", "Szerző", "Oldalszám", "Kiadás dátuma", "ISBN", "Kategória", "Törlés", ""}, 0) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 7) {
+                    return Boolean.class; 
+                }
+                return super.getColumnClass(columnIndex);
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 7 || column == 8; 
+            }
+        };
 
         frame.getContentPane().setLayout(null);
         table = new JTable(model);
@@ -50,11 +69,11 @@ public class KonyvKezeloApp {
         frame.getContentPane().add(scrollPane);
 
         searchLabel = new JLabel("Keresés:");
-        searchLabel.setBounds(10, 10, 60, 25);
+        searchLabel.setBounds(10, 10, 87, 25);
         frame.getContentPane().add(searchLabel);
         
         searchField = new JTextField();
-        searchField.setBounds(70, 10, 200, 25);
+        searchField.setBounds(78, 10, 93, 25);
         frame.getContentPane().add(searchField);
         searchField.addActionListener(e -> {
             searchBooks();
@@ -62,7 +81,7 @@ public class KonyvKezeloApp {
         });
         
         searchButton = new JButton("Keresés");
-        searchButton.setBounds(280, 10, 100, 25);
+        searchButton.setBounds(173, 10, 100, 25);
         searchButton.addActionListener(e -> searchBooks());
         frame.getContentPane().add(searchButton);
 
@@ -72,14 +91,31 @@ public class KonyvKezeloApp {
         frame.getContentPane().add(addButton);
         
         randomButton = new JButton("Mit olvassak legközelebb?");
-        randomButton.setBounds(450, 10, 220, 25);
+        randomButton.setBounds(484, 10, 220, 25);
         randomButton.addActionListener(e -> selectRandomBook());
         frame.getContentPane().add(randomButton);
+        
+        JButton btnRendezsCmSzerint = new JButton("Rendezés cím szerint");
+        btnRendezsCmSzerint.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		sortBooksByTitle();
+        	}
+        });
+        btnRendezsCmSzerint.setBounds(285, 10, 187, 25);
+        frame.getContentPane().add(btnRendezsCmSzerint);
+        
+        JButton btnTrls = new JButton("Törlés");
+        btnTrls.setBounds(771, 321, 117, 25);
+        btnTrls.addActionListener(e -> deleteData(-1)); 
+        frame.getContentPane().add(btnTrls);
 
-        table.getColumnModel().getColumn(7).setCellRenderer(new EditButtonRenderer());
-        table.getColumnModel().getColumn(8).setCellRenderer(new DeleteButtonRenderer());
-       
-        table.getColumnModel().getColumn(7).setCellEditor(new ButtonEditor(new JCheckBox()));
+
+        frame.getContentPane().add(btnTrls);
+        
+        table.getColumnModel().getColumn(7).setCellRenderer(new CheckBoxRenderer()); 
+        table.getColumnModel().getColumn(7).setCellEditor(new CheckBoxEditor(new JCheckBox())); 
+
+        table.getColumnModel().getColumn(8).setCellRenderer(new EditButtonRenderer());
         table.getColumnModel().getColumn(8).setCellEditor(new ButtonEditor(new JCheckBox()));
 
         frame.setVisible(true);
@@ -115,7 +151,7 @@ public class KonyvKezeloApp {
                         String isbn = parts[5];  
                         String category = parts[6]; 
 
-                        model.addRow(new Object[]{id, title, author, pages, date, isbn, category});
+                        model.addRow(new Object[]{id, title, author, pages, date, isbn, category, false, "Módosítás"});
 
                         lastId = Math.max(lastId, id); 
                     } catch (NumberFormatException e) {
@@ -137,10 +173,10 @@ public class KonyvKezeloApp {
     }
 
     private void deleteData(int rowId) {
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if ((int) model.getValueAt(i, 0) == rowId) {
+    	for (int i = model.getRowCount() - 1; i >= 0; i--) {
+            Object value = model.getValueAt(i, 7);
+            if (Boolean.TRUE.equals(value)) {
                 model.removeRow(i);
-                break;
             }
         }
 
@@ -152,7 +188,7 @@ public class KonyvKezeloApp {
                         model.getValueAt(i, 3) + ", " +
                         model.getValueAt(i, 4) + ", " +
                         model.getValueAt(i, 5) + ", " +
-                        model.getValueAt(i, 6) + "\n"); 
+                        model.getValueAt(i, 6) + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -248,21 +284,16 @@ public class KonyvKezeloApp {
             rowId = (Integer) model.getValueAt(row, 0); 
             this.column = column;
 
-            if (column == 7) {
+            if (column == 8) {
                 button.setText("Módosítás");
             } 
-            if (column == 8) {
-                button.setText("Törlés");
-            }
 
             isPushed = true;
 
             button.addActionListener(e -> {
                 if (isPushed) {
-                    if (column == 7) {
+                    if (column == 8) {
                         editData(rowId); 
-                    } else if (column == 8) {
-                        deleteData(rowId); 
                     }
                     isPushed = false;
                 }
@@ -274,6 +305,58 @@ public class KonyvKezeloApp {
         public Object getCellEditorValue() {
             isPushed = false;
             return "Művelet";
+        }
+    }
+    
+    class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        	setSelected(Boolean.TRUE.equals(value));
+            return this;
+        }
+    }
+
+    class CheckBoxEditor extends DefaultCellEditor {
+        public CheckBoxEditor(JCheckBox checkBox) {
+            super(checkBox);
+        }
+
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            JCheckBox checkBox = (JCheckBox) super.getTableCellEditorComponent(table, value, isSelected, row, column);
+            checkBox.setSelected(Boolean.TRUE.equals(value));
+            return checkBox;
+        }
+
+        public Object getCellEditorValue() {
+            return Boolean.valueOf(((JCheckBox) getComponent()).isSelected());
+        }
+    }
+    
+    private void sortBooksByTitle() {
+        int rowCount = model.getRowCount();
+        if (rowCount <= 1) {
+            return; 
+        }
+
+        List<Object[]> rows = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            Object[] row = new Object[model.getColumnCount()];
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                row[j] = model.getValueAt(i, j);
+            }
+            rows.add(row);
+        }
+
+        Collections.sort(rows, new Comparator<Object[]>() {
+            public int compare(Object[] row1, Object[] row2) {
+                String title1 = (String) row1[1]; 
+                String title2 = (String) row2[1]; 
+                return title1.compareTo(title2);
+            }
+        });
+
+        model.setRowCount(0);
+        for (Object[] row : rows) {
+            model.addRow(row);
         }
     }
   }
