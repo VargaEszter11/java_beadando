@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+@SuppressWarnings("serial")
 public class EditButtonRenderer extends JButton implements TableCellRenderer {
     public EditButtonRenderer() {
         setText("Módosítás");

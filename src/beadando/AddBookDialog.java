@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
+@SuppressWarnings("serial")
 public class AddBookDialog extends JDialog {
     private JTextField titleField, authorField, pagesField, dateField, isbnField, categoryField;
     private JButton saveButton;
@@ -44,7 +45,6 @@ public class AddBookDialog extends JDialog {
         saveButton = new JButton("Mentés");
         saveButton.addActionListener(e -> saveNewBookData());
 
-        // Enter billentyű figyelése minden mezőben
         KeyAdapter enterKeyAdapter = new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -61,7 +61,6 @@ public class AddBookDialog extends JDialog {
         isbnField.addKeyListener(enterKeyAdapter);
         categoryField.addKeyListener(enterKeyAdapter);
 
-        // Vagy alternatív megoldás: a dialógus gyökérpaneljének beállítása
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "saveAction");
         getRootPane().getActionMap().put("saveAction", new AbstractAction() {

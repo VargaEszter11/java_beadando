@@ -4,6 +4,7 @@ package beadando;
 import javax.swing.*;
 import java.awt.*;
 
+@SuppressWarnings("serial")
 public class ResultPanel extends JPanel {
     private JLabel resultsLabel;
 

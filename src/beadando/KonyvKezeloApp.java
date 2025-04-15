@@ -3,8 +3,6 @@ package beadando;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,7 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -41,7 +38,9 @@ public class KonyvKezeloApp {
     private boolean sortedByTitle = false;
     private JButton sortButton;
 
-    public KonyvKezeloApp() {
+    //buttons, etc
+    @SuppressWarnings("serial")
+	public KonyvKezeloApp() {
         frame = new JFrame("Könyvkezelő alkalmazás");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 400);
@@ -106,15 +105,17 @@ public class KonyvKezeloApp {
         btnTrls.setBounds(771, 321, 117, 25);
         btnTrls.addActionListener(e -> deleteData(-1)); 
         frame.getContentPane().add(btnTrls);
-
-
-        frame.getContentPane().add(btnTrls);
         
         table.getColumnModel().getColumn(7).setCellRenderer(new CheckBoxRenderer()); 
         table.getColumnModel().getColumn(7).setCellEditor(new CheckBoxEditor(new JCheckBox())); 
 
         table.getColumnModel().getColumn(8).setCellRenderer(new EditButtonRenderer());
         table.getColumnModel().getColumn(8).setCellEditor(new ButtonEditor(new JCheckBox()));
+        
+        DarkModeToggle darkModeToggle = new DarkModeToggle(frame, table, model);
+        JCheckBox darkModeCheckBox = darkModeToggle.createDarkModeCheckBox();
+        darkModeCheckBox.setBounds(10, 320, 100, 25);
+        frame.getContentPane().add(darkModeCheckBox);
 
         frame.setVisible(true);
         loadFromFile();
@@ -266,11 +267,14 @@ public class KonyvKezeloApp {
             "Szerző: " + author + "</html>");
     }
     
-    class ButtonEditor extends DefaultCellEditor {
+    //modify button
+    @SuppressWarnings("serial")
+	class ButtonEditor extends DefaultCellEditor {
         private JButton button;
         private boolean isPushed;
         private int rowId;
-        private int column;
+        @SuppressWarnings("unused")
+		private int column;
 
         public ButtonEditor(JCheckBox checkBox) {
             super(checkBox);
@@ -306,14 +310,17 @@ public class KonyvKezeloApp {
         }
     }
     
-    class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+    //delete checkbox
+    @SuppressWarnings("serial")
+	class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         	setSelected(Boolean.TRUE.equals(value));
             return this;
         }
     }
 
-    class CheckBoxEditor extends DefaultCellEditor {
+    @SuppressWarnings("serial")
+	class CheckBoxEditor extends DefaultCellEditor {
         public CheckBoxEditor(JCheckBox checkBox) {
             super(checkBox);
         }
@@ -329,6 +336,7 @@ public class KonyvKezeloApp {
         }
     }
     
+    //sorting
     private void toggleSorting() {
         if (!sortedByTitle) {
             sortBooksByTitle();

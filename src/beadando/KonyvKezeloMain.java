@@ -8,7 +8,7 @@ public class KonyvKezeloMain {
             Login login = new Login(null);
 
             if (login.isSuccessfulLogin()) {
-                new FileChooser();
+                new KonyvKezeloApp();
             } else {
                 System.exit(0); 
             }

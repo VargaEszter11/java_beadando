@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+@SuppressWarnings("serial")
 public class EditBookDialog extends JDialog {
     private JTextField titleField, authorField, pagesField, dateField, isbnField, categoryField;
     private JButton saveButton;
@@ -58,7 +59,6 @@ public class EditBookDialog extends JDialog {
             saveButton = new JButton("Mentés");
             saveButton.addActionListener(e -> saveEditedData());
 
-            // Enter billentyű figyelése minden mezőben
             KeyAdapter enterKeyAdapter = new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent e) {
