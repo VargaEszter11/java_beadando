@@ -38,6 +38,8 @@ public class KonyvKezeloApp {
     private JLabel searchLabel;
     private ResultPanel resultPanel;
     private JButton randomButton;
+    private boolean sortedByTitle = false;
+    private JButton sortButton;
 
     public KonyvKezeloApp() {
         frame = new JFrame("Könyvkezelő alkalmazás");
@@ -95,14 +97,10 @@ public class KonyvKezeloApp {
         randomButton.addActionListener(e -> selectRandomBook());
         frame.getContentPane().add(randomButton);
         
-        JButton btnRendezsCmSzerint = new JButton("Rendezés cím szerint");
-        btnRendezsCmSzerint.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		sortBooksByTitle();
-        	}
-        });
-        btnRendezsCmSzerint.setBounds(285, 10, 187, 25);
-        frame.getContentPane().add(btnRendezsCmSzerint);
+        sortButton = new JButton("Rendezés cím szerint");
+        sortButton.addActionListener(e -> toggleSorting());
+        sortButton.setBounds(285, 10, 187, 25);
+        frame.getContentPane().add(sortButton);
         
         JButton btnTrls = new JButton("Törlés");
         btnTrls.setBounds(771, 321, 117, 25);
@@ -331,29 +329,53 @@ public class KonyvKezeloApp {
         }
     }
     
-    private void sortBooksByTitle() {
-        int rowCount = model.getRowCount();
-        if (rowCount <= 1) {
-            return; 
+    private void toggleSorting() {
+        if (!sortedByTitle) {
+            sortBooksByTitle();
+        } else {
+            resetToOriginalOrder();
         }
+        sortedByTitle = !sortedByTitle;
+        sortButton.setText(sortedByTitle ? "Visszaállítás" : "Rendezés cím szerint");
+    }
+    
+    private void sortBooksByTitle() {
+        List<Object[]> rows = getRowsFromModel();
+        
+        Collections.sort(rows, (row1, row2) -> {
+            String title1 = (String) row1[1];
+            String title2 = (String) row2[1];
+            return title1.compareToIgnoreCase(title2);
+        });
 
+        updateModelWithSortedRows(rows);
+    }
+
+    private void resetToOriginalOrder() {
+        List<Object[]> rows = getRowsFromModel();
+        
+        Collections.sort(rows, (row1, row2) -> {
+            Integer id1 = (Integer) row1[0];
+            Integer id2 = (Integer) row2[0];
+            return id1.compareTo(id2);
+        });
+
+        updateModelWithSortedRows(rows);
+    }
+
+    private List<Object[]> getRowsFromModel() {
         List<Object[]> rows = new ArrayList<>();
-        for (int i = 0; i < rowCount; i++) {
+        for (int i = 0; i < model.getRowCount(); i++) {
             Object[] row = new Object[model.getColumnCount()];
             for (int j = 0; j < model.getColumnCount(); j++) {
                 row[j] = model.getValueAt(i, j);
             }
             rows.add(row);
         }
+        return rows;
+    }
 
-        Collections.sort(rows, new Comparator<Object[]>() {
-            public int compare(Object[] row1, Object[] row2) {
-                String title1 = (String) row1[1]; 
-                String title2 = (String) row2[1]; 
-                return title1.compareTo(title2);
-            }
-        });
-
+    private void updateModelWithSortedRows(List<Object[]> rows) {
         model.setRowCount(0);
         for (Object[] row : rows) {
             model.addRow(row);
